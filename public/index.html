@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐾 Andressa Pet - Clínica Veterinária</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>🐾 Andressa Pet</h1>
+            <nav class="header-nav">
+                <a href="#" onclick="showPage('dashboard')" class="active" data-page="dashboard">📊 Dashboard</a>
+                <a href="#" onclick="showPage('pets')" data-page="pets">🐕 Pets</a>
+                <a href="#" onclick="showPage('consultas')" data-page="consultas">📅 Consultas</a>
+                <a href="#" onclick="showPage('agenda')" data-page="agenda">📋 Agenda</a>
+                <a href="#" onclick="showPage('prontuarios')" data-page="prontuarios">📋 Prontuários</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- DASHBOARD -->
+        <div id="page-dashboard" class="page">
+            <div class="grid grid-4">
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-pets">0</div>
+                    <div class="stat-label">Pets Cadastrados</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-donos">0</div>
+                    <div class="stat-label">Donos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-hoje">0</div>
+                    <div class="stat-label">Consultas Hoje</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-semana">0</div>
+                    <div class="stat-label">Esta Semana</div>
+                </div>
+            </div>
+
+            <div class="grid grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>⚡ Ações Rápidas</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="quick-actions">
+                            <button class="quick-btn" onclick="abrirModalPet()">
+                                <span>🐕</span>
+                                <small>Novo Pet</small>
+                            </button>
+                            <button class="quick-btn" onclick="abrirModalDono()">
+                                <span>👤</span>
+                                <small>Novo Dono</small>
+                            </button>
+                            <button class="quick-btn" onclick="abrirModalConsulta()">
+                                <span>📅</span>
+                                <small>Agendar Consulta</small>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>📋 Próximas Consultas</h2>
+                    </div>
+                    <div class="card-body" id="proximas-consultas">
+                        <div class="empty-state">Carregando...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>📊 Agenda de Hoje</h2>
+                    <span id="data-hoje"></span>
+                </div>
+                <div class="card-body" id="agenda-hoje">
+                    <div class="empty-state">Nenhuma consulta agendada</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PETS -->
+        <div id="page-pets" class="page" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <h2>🐕 Pets Cadastrados</h2>
+                    <div class="search-box">
+                        <input type="text" id="busca-pet" placeholder="Buscar pet ou dono..." onkeyup="buscarPets()">
+                        <button class="btn btn-primary" onclick="buscarPets()">Buscar</button>
+                        <button class="btn btn-primary" onclick="abrirModalPet()">+ Novo Pet</button>
+                    </div>
+                </div>
+                <div class="card-body" id="lista-pets">
+                    <div class="empty-state">Carregando...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DONOS -->
+        <div id="page-donos" class="page" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <h2>👤 Donos Cadastrados</h2>
+                    <button class="btn btn-primary" onclick="abrirModalDono()">+ Novo Dono</button>
+                </div>
+                <div class="card-body" id="lista-donos">
+                    <div class="empty-state">Carregando...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONSULTAS -->
+        <div id="page-consultas" class="page" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <h2>📅 Consultas</h2>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <select id="filtro-consulta" class="form-control" style="width: auto;" onchange="carregarConsultas()">
+                            <option value="">Todas</option>
+                            <option value="agendada">Agendadas</option>
+                            <option value="confirmada">Confirmadas</option>
+                            <option value="finalizada">Finalizadas</option>
+                            <option value="cancelada">Canceladas</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="abrirModalConsulta()">+ Nova Consulta</button>
+                    </div>
+                </div>
+                <div class="card-body" id="lista-consultas">
+                    <div class="empty-state">Carregando...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AGENDA -->
+        <div id="page-agenda" class="page" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <h2>📋 Agenda</h2>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <input type="date" id="data-agenda" class="form-control" style="width: auto;" onchange="carregarAgenda()">
+                        <button class="btn btn-primary" onclick="abrirModalConsulta()">+ Agendar</button>
+                    </div>
+                </div>
+                <div class="card-body" id="lista-agenda">
+                    <div class="empty-state">Selecione uma data</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PRONTUÁRIOS -->
+        <div id="page-prontuarios" class="page" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <h2>📋 Histórico de Prontuários</h2>
+                </div>
+                <div class="card-body" id="lista-prontuarios">
+                    <div class="empty-state">Carregando...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DETALHE PET -->
+        <div id="page-pet-detalhe" class="page" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <button class="btn btn-outline" onclick="showPage('pets')">← Voltar</button>
+                    <h2 id="pet-detalhe-nome">Detalhes do Pet</h2>
+                </div>
+                <div class="card-body" id="pet-detalhe-content">
+                    <!-- Conteúdo carregado dinamicamente -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL PET -->
+    <div class="modal" id="modal-pet">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-pet-titulo">Novo Pet</h3>
+                <button class="modal-close" onclick="fecharModal('modal-pet')">&times;</button>
+            </div>
+            <form id="form-pet" onsubmit="salvarPet(event)">
+                <div class="modal-body">
+                    <input type="hidden" id="pet-id">
+                    <div class="form-group">
+                        <label>Dono*</label>
+                        <select id="pet-dono" class="form-control" required>
+                            <option value="">Selecione...</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nome do Pet*</label>
+                            <input type="text" id="pet-nome" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Espécie*</label>
+                            <select id="pet-especie" class="form-control" required>
+                                <option value="">Selecione...</option>
+                                <option value="Cachorro">Cachorro</option>
+                                <option value="Gato">Gato</option>
+                                <option value="Ave">Ave</option>
+                                <option value="Roedor">Roedor</option>
+                                <option value="Réptil">Réptil</option>
+                                <option value="Outro">Outro</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Raça</label>
+                            <input type="text" id="pet-raca" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Sexo*</label>
+                            <select id="pet-sexo" class="form-control" required>
+                                <option value="">Selecione...</option>
+                                <option value="Macho">Macho</option>
+                                <option value="Fêmea">Fêmea</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Data Nascimento</label>
+                            <input type="date" id="pet-nascimento" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Peso (kg)</label>
+                            <input type="number" step="0.01" id="pet-peso" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Cor</label>
+                        <input type="text" id="pet-cor" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Observações</label>
+                        <textarea id="pet-observacoes" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" onclick="fecharModal('modal-pet')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DONO -->
+    <div class="modal" id="modal-dono">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-dono-titulo">Novo Dono</h3>
+                <button class="modal-close" onclick="fecharModal('modal-dono')">&times;</button>
+            </div>
+            <form id="form-dono" onsubmit="salvarDono(event)">
+                <div class="modal-body">
+                    <input type="hidden" id="dono-id">
+                    <div class="form-group">
+                        <label>Nome*</label>
+                        <input type="text" id="dono-nome" class="form-control" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Telefone</label>
+                            <input type="text" id="dono-telefone" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="dono-email" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Endereço</label>
+                        <textarea id="dono-endereco" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Observações</label>
+                        <textarea id="dono-observacoes" class="form-control" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" onclick="fecharModal('modal-dono')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL CONSULTA -->
+    <div class="modal" id="modal-consulta">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3 id="modal-consulta-titulo">Nova Consulta</h3>
+                <button class="modal-close" onclick="fecharModal('modal-consulta')">&times;</button>
+            </div>
+            <form id="form-consulta" onsubmit="salvarConsulta(event)">
+                <div class="modal-body">
+                    <input type="hidden" id="consulta-id">
+                    <div class="form-group">
+                        <label>Pet*</label>
+                        <select id="consulta-pet" class="form-control" required>
+                            <option value="">Selecione...</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Data/Hora*</label>
+                            <input type="datetime-local" id="consulta-data" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo*</label>
+                            <select id="consulta-tipo" class="form-control" required>
+                                <option value="consulta_geral">Consulta Geral</option>
+                                <option value="vacina">Vacina</option>
+                                <option value="retorno">Retorno</option>
+                                <option value="exame">Exame</option>
+                                <option value="emergencia">Emergência</option>
+                                <option value="cirurgia">Cirurgia</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select id="consulta-status" class="form-control">
+                                <option value="agendada">Agendada</option>
+                                <option value="confirmada">Confirmada</option>
+                                <option value="em_andamento">Em Andamento</option>
+                                <option value="finalizada">Finalizada</option>
+                                <option value="cancelada">Cancelada</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Valor (R$)</label>
+                            <input type="number" step="0.01" id="consulta-valor" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Observações</label>
+                        <textarea id="consulta-observacoes" class="form-control" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" onclick="fecharModal('modal-consulta')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL PRONTUÁRIO -->
+    <div class="modal" id="modal-prontuario">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3>📋 Prontuário</h3>
+                <button class="modal-close" onclick="fecharModal('modal-prontuario')">&times;</button>
+            </div>
+            <form id="form-prontuario" onsubmit="salvarProntuario(event)">
+                <div class="modal-body">
+                    <input type="hidden" id="prontuario-consulta-id">
+                    
+                    <!-- Dados do pet -->
+                    <div class="medical-section">
+                        <h4>📊 Sinais Vitais</h4>
+                        <div class="medical-data">
+                            <div class="medical-data-item">
+                                <label>Peso</label>
+                                <input type="number" step="0.01" id="prontuario-peso" class="form-control" style="text-align: center;">
+                            </div>
+                            <div class="medical-data-item">
+                                <label>Temperatura</label>
+                                <input type="number" step="0.1" id="prontuario-temperatura" class="form-control" style="text-align: center;">
+                            </div>
+                            <div class="medical-data-item">
+                                <label>FC</label>
+                                <input type="number" id="prontuario-fc" class="form-control" style="text-align: center;">
+                            </div>
+                            <div class="medical-data-item">
+                                <label>FR</label>
+                                <input type="number" id="prontuario-fr" class="form-control" style="text-align: center;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Queixa Principal</label>
+                        <textarea id="prontuario-queixa" class="form-control" rows="2"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Histórico</label>
+                        <textarea id="prontuario-historico" class="form-control" rows="2"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Exame Físico</label>
+                        <textarea id="prontuario-exame-fisico" class="form-control" rows="2"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Hipóteses Diagnósticas</label>
+                        <textarea id="prontuario-hipoteses" class="form-control" rows="2"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Diagnóstico Definitivo</label>
+                        <textarea id="prontuario-diagnostico" class="form-control" rows="2"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Prescrição / Receita</label>
+                        <textarea id="prontuario-prescricao" class="form-control" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Exames Solicitados</label>
+                        <textarea id="prontuario-exames" class="form-control" rows="2"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Orientações</label>
+                        <textarea id="prontuario-orientacoes" class="form-control" rows="2"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Atestado</label>
+                        <textarea id="prontuario-atestado" class="form-control" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" onclick="fecharModal('modal-prontuario')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar Prontuário</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL CONSULTA DETALHE -->
+    <div class="modal" id="modal-consulta-detalhe">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3>📅 Consulta</h3>
+                <button class="modal-close" onclick="fecharModal('modal-consulta-detalhe')">&times;</button>
+            </div>
+            <div class="modal-body" id="consulta-detalhe-content">
+                <!-- Conteúdo carregado dinamicamente -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" onclick="cancelarConsulta()">Cancelar Consulta</button>
+                <button type="button" class="btn btn-success" onclick="finalizarConsulta()">Finalizar</button>
+                <button type="button" class="btn btn-primary" onclick="abrirProntuario()">Prontuário</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>

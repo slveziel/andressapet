@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Andressa Pet</string>
+    <color name="primary">#e91e63</color>
+    <color name="primary_dark">#c2185b</color>
+    <color name="accent">#00bcd4</color>
+</resources>
